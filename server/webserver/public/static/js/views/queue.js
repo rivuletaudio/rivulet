@@ -5,6 +5,7 @@ var QueueView = Backbone.View.extend({
     if (this.model) {
       this.listenTo(this.model.get('songs'), "change add remove reset swap", this.render);
       this.listenTo(this.model, "change", this.render);
+      this.listenTo(App.playlists, "change", this.render);
     }
     this.songViews = [];
     this.render();

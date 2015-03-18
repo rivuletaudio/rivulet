@@ -1,0 +1,413 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		32E368551AB938010033163D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E368541AB938010033163D /* AppDelegate.m */; };
+		32E368571AB938010033163D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E368561AB938010033163D /* main.m */; };
+		32E368591AB938010033163D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32E368581AB938010033163D /* Images.xcassets */; };
+		32E3685C1AB938010033163D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 32E3685A1AB938010033163D /* MainMenu.xib */; };
+		32E368681AB938010033163D /* RivuletTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 32E368671AB938010033163D /* RivuletTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		32E368621AB938010033163D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 32E368461AB938010033163D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 32E3684D1AB938010033163D;
+			remoteInfo = Rivulet;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		32E3684E1AB938010033163D /* Rivulet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rivulet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		32E368521AB938010033163D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		32E368531AB938010033163D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		32E368541AB938010033163D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		32E368561AB938010033163D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		32E368581AB938010033163D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		32E3685B1AB938010033163D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		32E368611AB938010033163D /* RivuletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RivuletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		32E368661AB938010033163D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		32E368671AB938010033163D /* RivuletTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RivuletTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		32E3684B1AB938010033163D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32E3685E1AB938010033163D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		32E368451AB938010033163D = {
+			isa = PBXGroup;
+			children = (
+				32E368501AB938010033163D /* Rivulet */,
+				32E368641AB938010033163D /* RivuletTests */,
+				32E3684F1AB938010033163D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		32E3684F1AB938010033163D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				32E3684E1AB938010033163D /* Rivulet.app */,
+				32E368611AB938010033163D /* RivuletTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		32E368501AB938010033163D /* Rivulet */ = {
+			isa = PBXGroup;
+			children = (
+				32E368531AB938010033163D /* AppDelegate.h */,
+				32E368541AB938010033163D /* AppDelegate.m */,
+				32E368581AB938010033163D /* Images.xcassets */,
+				32E3685A1AB938010033163D /* MainMenu.xib */,
+				32E368511AB938010033163D /* Supporting Files */,
+			);
+			path = Rivulet;
+			sourceTree = "<group>";
+		};
+		32E368511AB938010033163D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				32E368521AB938010033163D /* Info.plist */,
+				32E368561AB938010033163D /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		32E368641AB938010033163D /* RivuletTests */ = {
+			isa = PBXGroup;
+			children = (
+				32E368671AB938010033163D /* RivuletTests.m */,
+				32E368651AB938010033163D /* Supporting Files */,
+			);
+			path = RivuletTests;
+			sourceTree = "<group>";
+		};
+		32E368651AB938010033163D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				32E368661AB938010033163D /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		32E3684D1AB938010033163D /* Rivulet */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32E3686B1AB938010033163D /* Build configuration list for PBXNativeTarget "Rivulet" */;
+			buildPhases = (
+				32E3684A1AB938010033163D /* Sources */,
+				32E3684B1AB938010033163D /* Frameworks */,
+				32E3684C1AB938010033163D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Rivulet;
+			productName = Rivulet;
+			productReference = 32E3684E1AB938010033163D /* Rivulet.app */;
+			productType = "com.apple.product-type.application";
+		};
+		32E368601AB938010033163D /* RivuletTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32E3686E1AB938010033163D /* Build configuration list for PBXNativeTarget "RivuletTests" */;
+			buildPhases = (
+				32E3685D1AB938010033163D /* Sources */,
+				32E3685E1AB938010033163D /* Frameworks */,
+				32E3685F1AB938010033163D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				32E368631AB938010033163D /* PBXTargetDependency */,
+			);
+			name = RivuletTests;
+			productName = RivuletTests;
+			productReference = 32E368611AB938010033163D /* RivuletTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		32E368461AB938010033163D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+				ORGANIZATIONNAME = rivulet;
+				TargetAttributes = {
+					32E3684D1AB938010033163D = {
+						CreatedOnToolsVersion = 6.2;
+					};
+					32E368601AB938010033163D = {
+						CreatedOnToolsVersion = 6.2;
+						TestTargetID = 32E3684D1AB938010033163D;
+					};
+				};
+			};
+			buildConfigurationList = 32E368491AB938010033163D /* Build configuration list for PBXProject "Rivulet" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 32E368451AB938010033163D;
+			productRefGroup = 32E3684F1AB938010033163D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				32E3684D1AB938010033163D /* Rivulet */,
+				32E368601AB938010033163D /* RivuletTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		32E3684C1AB938010033163D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32E368591AB938010033163D /* Images.xcassets in Resources */,
+				32E3685C1AB938010033163D /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32E3685F1AB938010033163D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		32E3684A1AB938010033163D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32E368571AB938010033163D /* main.m in Sources */,
+				32E368551AB938010033163D /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32E3685D1AB938010033163D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32E368681AB938010033163D /* RivuletTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		32E368631AB938010033163D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 32E3684D1AB938010033163D /* Rivulet */;
+			targetProxy = 32E368621AB938010033163D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		32E3685A1AB938010033163D /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32E3685B1AB938010033163D /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		32E368691AB938010033163D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		32E3686A1AB938010033163D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		32E3686C1AB938010033163D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Rivulet/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		32E3686D1AB938010033163D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Rivulet/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		32E3686F1AB938010033163D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = RivuletTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Rivulet.app/Contents/MacOS/Rivulet";
+			};
+			name = Debug;
+		};
+		32E368701AB938010033163D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = RivuletTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Rivulet.app/Contents/MacOS/Rivulet";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		32E368491AB938010033163D /* Build configuration list for PBXProject "Rivulet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32E368691AB938010033163D /* Debug */,
+				32E3686A1AB938010033163D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		32E3686B1AB938010033163D /* Build configuration list for PBXNativeTarget "Rivulet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32E3686C1AB938010033163D /* Debug */,
+				32E3686D1AB938010033163D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		32E3686E1AB938010033163D /* Build configuration list for PBXNativeTarget "RivuletTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32E3686F1AB938010033163D /* Debug */,
+				32E368701AB938010033163D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 32E368461AB938010033163D /* Project object */;
+}

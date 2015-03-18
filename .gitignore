@@ -1,0 +1,9 @@
+.idea
+node_modules
+.tmp
+.sass-cache
+/node_modules/
+npm-debug.log
+*.swp
+.DS_Store
+*.py[cod]

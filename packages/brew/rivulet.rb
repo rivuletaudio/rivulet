@@ -1,8 +1,8 @@
 class Rivulet < Formula
   homepage "http://rivulet.audio/"
-  url "file:///Users/rz/dev/wwp-sandbox/rivulet-0.1.tar.gz"
+  url "file:///Users/rz/dev/wwp-sandbox/rivulet.tar.gz"
   version "0.1"
-  sha256 "5bc00f68b30728e9146d52a28a980ba91a57ca34f13026e106c3887129e9cb6f"
+  sha256 "461781243d3a1c6be44b604ea79cecffdf39f4b724ecf8023c9cc9dc1a426743"
 
   # depends_on "cmake" => :build
   depends_on :python
@@ -20,7 +20,7 @@ class Rivulet < Formula
     system "pip2", "install", "--install-option=--prefix=#{HOMEBREW_PREFIX}", "lxml"
     system "pip2", "install", "--install-option=--prefix=#{HOMEBREW_PREFIX}", "pyyaml"
     
-    File.write("./run-osx.sh", "#!/bin/sh\npython2 #{prefix}/server/webserver/webserver.py")
+    File.write("./run-osx.sh", "#!/bin/sh\nexport PATH=#{HOMEBREW_PREFIX}/bin:$PATH\nexec #{HOMEBREW_PREFIX}/bin/python2 #{prefix}/server/webserver/webserver.py")
     File.new("./run-osx.sh").chmod(0777)
     
     FileUtils.cp_r "./", "#{prefix}"
@@ -30,6 +30,12 @@ class Rivulet < Formula
     end
     
     File.link("#{prefix}/run-osx.sh", "#{HOMEBREW_PREFIX}/bin/rivulet")
+
+    if File.exist?("/Applications/Rivulet.app")
+      FileUtils.rmdir("/Applications/Rivulet.app")
+    end
+    
+    FileUtils.cp_r("#{prefix}/osx-agent/Rivulet.app", "/Applications/Rivulet.app")
   end
 
   test do
