@@ -1,0 +1,12 @@
+# copy this config to ~/.config/rivulet/config.yaml and edit your own copy instead of this one
+
+# this path is relative to the root of the project
+private_data_path: '~/rivulet'
+
+# these paths are relative to private_data_path
+resume_data_path: 'resume_data'
+torrent_data_path: 'torrents'
+
+lastfm_api_key: '112bceb16f3441a10fc4b4694548372f'
+
+search_results_per_page: 20

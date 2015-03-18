@@ -1,0 +1,26 @@
+# Maintainer: Anonymous <f1586566@trbvm.com>
+
+pkgname=rivulet
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='A music player for torrents'
+arch=('any')
+url="http://rivulet.audio/"
+license=('AGPL')
+depends=('libtorrent-rasterbar' 'python2' 'python2-beautifulsoup4' 'python2-tornado' 'python2-lxml' 'python2-yaml' 'flac' 'lame')
+source=('http://localhost:8000/rivulet.tar.gz')
+sha256sums=('69f31e33d18fa21f14c190b3f4c5a727b8d860a0bc5dff8ff800bd8aeaf9feed')
+
+package() {
+  mkdir -p ${pkgdir}/usr/bin/
+  mkdir -p ${pkgdir}/usr/share/rivulet
+  
+  cp -r ${srcdir}/Rivulet/* ${pkgdir}/usr/share/rivulet/
+
+  cat << EOF > ${pkgdir}/usr/bin/rivulet
+#!/bin/sh
+python2 /usr/share/rivulet/server/webserver/webserver.py
+EOF
+
+  chmod 755 ${pkgdir}/usr/bin/rivulet
+}

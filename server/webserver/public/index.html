@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>rivulet.audio</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="static/css/simple-sidebar.css" rel="stylesheet">
+    <link href="static/css/dropdown-submenu.css" rel="stylesheet">
+    <link href="static/css/main.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!-- TODO: serve these ourselves to avoid tracking -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+  <div class="page-container">
+  
+    <!-- top navbar -->
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+         <div class="container">
+           <div class="navbar-header" style="width: 100%">
+              <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">rivulet.audio</a>
+
+              <div class="col-xs-5 pull-right">
+                <form class="navbar-form pull-right" id="search-bar-form" role="search">
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" id="search-bar-input">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </span>
+                  </div>
+                </form>
+              </div>
+            </div>
+         </div>
+      </div>
+        
+      <div class="container">
+        <div class="row row-offcanvas row-offcanvas-left">
+          
+          <!-- sidebar -->
+          <div class="col-xs-6 col-sm-2 sidebar-offcanvas" id="sidebar" role="navigation">
+            <ul class="nav nav-pills nav-stacked nav-buttons">
+                <li>
+                    <a href="#search" id="tab-title-search">Search</a>
+                </li>
+                <li>
+                    <a href="#playlists" id="tab-title-playlists">Playlists</a>
+                </li>
+                <li>
+                    <a href="#providers" id="tab-title-providers">Providers</a>
+                </li>
+                <li>
+                    <a href="#torrents" id="tab-title-torrents">Torrents</a>
+                </li>
+            </ul>
+            <iframe data-aa='58334' src='//ad.a-ads.com/58334?size=200x200' scrolling='no' style='margin-left: -15px; width:200px; height:200px; border:0px; padding:0;overflow:hidden' allowtransparency='true'></iframe>
+          </div>
+      
+          <!-- main area -->
+          <div class="col-xs-12 col-sm-10 main-area">
+            <div id="app"></div>
+
+            <div class="footer-sticky">
+              <div class="container">
+                <p class="text-muted">Search powered by last.fm, kickass.to, oldpiratebay.org and thepiratebay.se.</p>
+              </div>
+            </div>
+          </div><!-- /.col-xs-12 main -->
+      </div><!--/.row-->
+    </div><!--/.container-->
+  </div><!--/.page-container-->
+
+  <footer class="footer footer-fixed-bottom">
+    <div id="player" class="player-main">...</div>
+    <div id="queue">
+      <div class="queue-scroller">
+        <ul class="list-unstyled queue-songs list-inline">
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+    <script type="template" id="template-providers">
+      <h1>Search Providers</h1>
+      {{#each providers}}
+      <div class="checkbox">
+        <label>
+          {{#if selected}}
+          <input class="provider-selector" type="checkbox" value="" data-index="{{@index}}" checked> {{title}}
+          {{else}}
+          <input class="provider-selector" type="checkbox" value="" data-index="{{@index}}"> {{title}}
+          {{/if}}
+        </label>
+      </div>
+      {{/each}}
+    </script>
+    
+    <script type="template" id="template-search">
+      <h1>Search Results</h1>
+      <div id="search-results">
+        <ul class="list-unstyled">
+        </ul>
+      </div>
+    </script>
+
+    <script type="template" id="template-queue-song">
+      {{#if meta.current}}
+      <div class="current-song song" data-pos="{{meta.pos}}">
+      {{else}}
+      <div class="song" data-pos="{{meta.pos}}">
+      {{/if}}
+        {{#if image.cover_url_medium}}
+          <img class="album-art" src="{{image.cover_url_medium}}"/>
+        {{else}}
+          <img class="album-art" src="data:image/png;base64,{{identicon}}">
+        {{/if}}
+        <i class="glyphicon glyphicon-refresh spinner sources-spinner" style="display:none"></i>
+        {{#if sources}}
+          <div class="progress progress-thin">
+            {{#each pieces}}
+              {{#if this}}
+                <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{../../pb_widths}}%;"></div>
+              {{else}}
+                {{#if ../../../requested}}
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{../../../pb_widths}}%;"></div>
+                {{/if}}
+              {{/if}}
+            {{/each}}
+          </div>
+        {{/if}}
+        {{#if sources}}
+          <div class="main-action">
+            {{#ifCond percent-dl '>' 0}}
+              <button class="btn btn-default play-link btn-success btn-xs">
+                <i class="glyphicon glyphicon-play"></i>
+              </button>
+            {{else}}
+              <button class="btn btn-default btn-success btn-xs" disabled>
+                <i class="glyphicon glyphicon-play"></i>
+              </button>
+            {{/ifCond}}
+          </div>
+          <div class="dropdown-action dropup">
+            <button type="button" class="btn btn-xs btn-default dropdown-toggle dropdown-hack-button" data-toggle="dropdown" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu multi-level dropdown-hack-menu" role="menu">
+
+              <li class="dropdown-submenu">
+                <a href="#"> Add to Playlist </a>
+                <ul class="dropdown-menu">
+                {{#if playlists}}
+                  {{#each playlists}}
+                    <li><a href="#" class="add-to-playlist" playlist-id="{{@index}}"> {{title}}</a></li>
+                  {{/each}}
+                  <li class="divider"></li>
+                  <li><a href="#" class="add-to-new-playlist"> New Playlist </a></li>
+                {{else}}
+                  <li><a href="#" class="add-to-new-playlist"> New Playlist </a></li>
+                {{/if}}
+                </ul>
+              </li>
+              
+              <li class="divider"></li>
+              {{#if sources}}
+                <li class="dropdown-submenu">
+                  <a href="#"> Sources </a>
+                  <ul class="dropdown-menu">
+                    {{#each sources}}
+                      {{#ifCond ../selected_source_id '===' @index}}
+                        <li class="active"><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                      {{else}}
+                        <li><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                      {{/ifCond}}
+                    {{/each}}
+                  </ul>
+                </li>
+              {{else}}
+                <li class="disabled"><a> Sources </a>
+              {{/if}}
+              <li class="divider"></li>
+                
+              {{#ifCond percent-dl '<' 100 }}
+                {{#ifCond downloading '||' requested}}
+                  <li class="disabled"><a>Make Available Offline</a></li>
+                {{else}}
+                  <li><a class="make-offline-link" href="#">Make Available Offline</a></li>
+                {{/ifCond}}
+              {{/ifCond}}
+                  
+              <li><a class="download-link" href="#">Download</a></li>
+              <li class="divider"></li>
+              {{#unless meta.first}}
+                <li><a class="move-song-up-in-queue" href="#">Move Song Up</a></li>
+              {{/unless}}
+              {{#unless meta.last}}
+                <li><a class="move-song-down-in-queue" href="#">Move Song Down</a></li>
+              {{/unless}}
+              <li class="divider"></li>
+              <li><a class="remove-song-in-queue" href="#">Remove from playlist</a></li>
+            </ul>
+          </div>
+        {{else}}
+          <button class="btn btn-default sources-search btn-success btn-xs">
+            <i class="glyphicon glyphicon-search"></i>
+          </button>
+        {{/if}}
+
+        <div class="artist text-center">{{artist}}</div>
+        <div class="title text-center">{{title}}</div>
+      </div>
+    </script>
+
+    <script type="template" id="template-search-results-song">
+      <div class="song" data-pos="{{meta.pos}}">
+        {{#if sources}}
+          <div class="progress progress-thin">
+            {{#each pieces}}
+              {{#if this}}
+                <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{../../pb_widths}}%;"></div>
+              {{else}}
+                {{#if ../../../requested}}
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{../../../pb_widths}}%;"></div>
+                {{/if}}
+              {{/if}}
+            {{/each}}
+          </div>
+        {{/if}}
+        {{#if image.cover_url_small}}
+          <img height="34px" width="34px" src="{{image.cover_url_small}}"/>
+        {{else}}
+          <img width="34px" height="34px" src="data:image/png;base64,{{identicon}}">
+        {{/if}}
+
+        {{#if sources}}
+          <div class="btn-group">
+            {{#ifCond percent-dl '===' 100}}
+            <button type="button" class="btn btn-xs btn-success add-play-link"><i class="glyphicon glyphicon-play"></i></button>
+            {{else}}
+            <button type="button" class="btn btn-xs btn-success add-last-link"><i class="glyphicon glyphicon-plus"></i></button>
+            {{/ifCond}}
+            <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu multi-level" role="menu">
+              {{#ifCond percent-dl '===' 100}}
+                <li><a class="add-next-link" href="#">Add Next</a></li>
+                <li><a class="add-last-link" href="#">Add Last</a></li>
+              {{else}}
+                {{#ifCond percent-dl '>' 0}}
+                  <li><a class="add-play-link" href="#">Play Now</a></li>
+                {{else}}
+                  <li class="disabled"><a>Play Now</a></li>
+                {{/ifCond}}
+                <li><a class="add-next-link" href="#">Add Next</a></li>
+              {{/ifCond}}
+              <li class="divider"></li>
+              
+              <li class="dropdown-submenu">
+                <a href="#"> Add to Playlist </a>
+                <ul class="dropdown-menu">
+                {{#if playlists}}
+                  {{#each playlists}}
+                    <li><a href="#" class="add-to-playlist" playlist-id="{{@index}}"> {{title}}</a></li>
+                  {{/each}}
+                  <li class="divider"></li>
+                  <li><a href="#" class="add-to-new-playlist"> New Playlist </a></li>
+                {{else}}
+                  <li><a href="#" class="add-to-new-playlist"> New Playlist </a></li>
+                {{/if}}
+                </ul>
+              </li>
+             
+              <li class="divider"></li>
+              {{#if sources}}
+                <li class="dropdown-submenu">
+                  <a href="#"> Sources </a>
+                  <ul class="dropdown-menu">
+                    {{#each sources}}
+                      {{#ifCond ../selected_source_id '===' @index}}
+                        <li class="active"><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                      {{else}}
+                        <li><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                      {{/ifCond}}
+                    {{/each}}
+                  </ul>
+                </li>
+              {{else}}
+                <li class="disabled"><a> Sources </a>
+              {{/if}}
+              <li class="divider"></li>
+                
+              {{#ifCond percent-dl '<' 100 }}
+                {{#ifCond downloading '||' requested}}
+                  <li class="disabled"><a>Make Available Offline</a></li>
+                {{else}}
+                  <li><a class="make-offline-link" href="#">Make Available Offline</a></li>
+                {{/ifCond}}
+              {{/ifCond}}
+                  
+              <li><a class="download-link" href="#">Download</a></li>
+            </ul>
+          </div>
+
+        {{else}}
+          <button class="btn btn-default sources-search btn-success btn-xs">
+            <i class="glyphicon glyphicon-search"></i>
+          </button>
+        {{/if}}
+          
+        {{artist}} - {{title}}
+        <i class="glyphicon glyphicon-refresh spinner sources-spinner" style="display:none"></i>
+      </div>
+    </script>
+
+
+    <script type="template" id="template-playlist">
+      <ul class="breadcrumb">
+        <li>
+          <a href="#playlists">Playlists</a>
+        </li>
+        <li class="active">
+          {{title}}
+          <div class="btn-group">
+            <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li><a class="add-current-playlist-play-link" href="#">Play</a></li>
+              <li><a class="add-current-playlist-next-link" href="#">Add Next</a></li>
+              <li><a class="add-current-playlist-last-link" href="#">Add Last</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+      <div>
+        <ul class="songs list-unstyled">
+        </ul>
+      </div>
+    </script>
+
+    <script type="template" id="template-playlists">
+      <input class="hidden upload-hack" type="file"> 
+      <ul class="breadcrumb">
+        <li>
+          Playlists
+        </li>
+      </ul>
+      <div>
+        <ul class="list-unstyled">
+          <li class="playlist-entry">
+            <button class="btn btn-default btn-success btn-xs new-playlist-link">
+              <i class="glyphicon glyphicon-plus"></i> New Playlist
+            </button>
+          </li>
+          <li class="playlist-entry">
+            <button class="btn btn-default btn-default btn-xs upload-playlist">
+              <i class="glyphicon glyphicon-upload"></i> Import Playlist
+            </button>
+          </li>
+          {{! this is a fake playlist that contains all available songs}}
+          <li class="playlist-entry">
+            <div class="btn-group">
+              <button class="btn btn-default add-playlist-play-link btn-success btn-xs" data-index="-1">
+                <i class="glyphicon glyphicon-play"></i>
+              </button>
+              <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a class="add-playlist-next-link" data-index="-1" href="#">Add Next</a></li>
+                <li><a class="add-playlist-last-link" data-index="-1" href="#">Add Last</a></li>
+                <li class="divider"></li>
+                <li><a class="download-playlist" data-index="-1" href="#">Download Playlist</a></li>
+              </ul>
+            </div>
+
+            <a href="#playlist/-1" class="playlist-link">
+              all available songs
+            </a>
+          </li>
+
+        {{#each playlists}}
+          <li class="playlist-entry">
+            <span class="title-no-edit">
+
+              <div class="btn-group">
+                <button class="btn btn-default add-playlist-play-link btn-success btn-xs" data-index="{{@index}}">
+                  <i class="glyphicon glyphicon-play"></i>
+                </button>
+                <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a class="add-playlist-next-link" data-index="{{@index}}" href="#">Add Next</a></li>
+                  <li><a class="add-playlist-last-link" data-index="{{@index}}" href="#">Add Last</a></li>
+                  <li class="divider"></li>
+                  <li><a class="edit-link" href="#">Edit Playlist</a></li>
+                  <li class="divider"></li>
+                  <li><a class="download-playlist" data-index="{{@index}}" href="#">Download Playlist</a></li>
+                  <li class="divider"></li>
+                  <li><a class="remove-playlist" data-index="{{@index}}" href="#">Remove Playlist</a></li>
+                </ul>
+              </div>
+              
+              <a href="#playlist/{{@index}}" class="playlist-link">
+                {{title}}
+              </a>
+            </span>
+            <span class="title-edit" style="display:none">
+              <form class="form-inline">
+                  <div class="input-group">
+                    <input type="text" class="form-control edit-input" placeholder="Playlist title" value="{{title}}" data-index="{{@index}}">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default btn-default no-edit-link">
+                        <i class="glyphicon glyphicon-pencil"></i>
+                      </button>
+                    </span>
+                  </div>
+              </form>
+            </span>
+          </li>
+        {{/each}}
+        </ul>
+      </div>
+    </script>
+
+    <script type="template" id="template-playlist-song">
+      <div class="song" data-pos="{{meta.pos}}">
+        {{#if sources}}
+          <div class="progress progress-thin">
+            {{#each pieces}}
+              {{#if this}}
+                <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{../../pb_widths}}%;"></div>
+              {{else}}
+                {{#if ../../../requested}}
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{../../../pb_widths}}%;"></div>
+                {{/if}}
+              {{/if}}
+            {{/each}}
+          </div>
+        {{/if}}
+        {{#if image.cover_url_small}}
+          <img height="34px" width="34px" src="{{image.cover_url_small}}"/>
+        {{else}}
+          <img width="34px" height="34px" src="data:image/png;base64,{{identicon}}">
+        {{/if}}
+        {{#if sources}}
+
+          <div class="btn-group">
+            {{#ifCond percent-dl '===' 100}}
+            <button type="button" class="btn btn-xs btn-success add-play-link"><i class="glyphicon glyphicon-play"></i></button>
+            {{else}}
+            <button type="button" class="btn btn-xs btn-success add-last-link"><i class="glyphicon glyphicon-plus"></i></button>
+            {{/ifCond}}
+            <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu multi-level" role="menu">
+              {{#ifCond percent-dl '===' 100}}
+                <li><a class="add-next-link" href="#">Add Next</a></li>
+                <li><a class="add-last-link" href="#">Add Last</a></li>
+              {{else}}
+                {{#ifCond percent-dl '>' 0}}
+                  <li><a class="add-play-link" href="#">Play Now</a></li>
+                {{else}}
+                  <li class="disabled"><a>Play Now</a></li>
+                {{/ifCond}}
+                <li><a class="add-next-link" href="#">Add Next</a></li>
+              {{/ifCond}}
+              <li class="divider"></li>
+               {{#if sources}}
+                <li class="dropdown-submenu">
+                  <a href="#"> Sources </a>
+                  <ul class="dropdown-menu">
+                    {{#each sources}}
+                      {{#ifCond ../selected_source_id '===' @index}}
+                        <li class="active"><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                      {{else}}
+                        <li><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                      {{/ifCond}}
+                    {{/each}}
+                  </ul>
+                </li>
+              {{else}}
+                <li class="disabled"><a> Sources </a>
+              {{/if}}
+              <li class="divider"></li>
+
+              {{#ifCond percent-dl '<' 100 }}
+                {{#ifCond downloading '||' requested}}
+                  <li class="disabled"><a>Make Available Offline</a></li>
+                {{else}}
+                  <li><a class="make-offline-link" href="#">Make Available Offline</a></li>
+                {{/ifCond}}
+              {{/ifCond}}
+
+              <li><a class="download-link" href="#">Download</a></li>
+              <li class="divider"></li>
+              {{#unless meta.first}}
+                <li><a class="move-song-up-in-playlist" href="#">Move Song Up</a></li>
+              {{/unless}}
+              {{#unless meta.last}}
+                <li><a class="move-song-down-in-playlist" href="#">Move Song Down</a></li>
+              {{/unless}}
+              <li class="divider"></li>
+              <li><a class="remove-song-in-playlist" href="#">Remove from playlist</a></li>
+            </ul>
+          </div>
+        {{else}}
+          <button class="btn btn-default sources-search btn-success btn-xs">
+            <i class="glyphicon glyphicon-search"></i>
+          </button>
+        {{/if}}
+          
+        {{artist}} - {{title}}
+        <i class="glyphicon glyphicon-refresh spinner sources-spinner" style="display:none"></i>
+      </div>
+    </script>
+
+    <script type="template" id="template-torrents">
+      <h1>Torrents</h1>
+      <div>
+        {{#if torrents}}
+        <ul class="list-unstyled">
+          {{#each torrents}}
+            <li class="torrent-entry">
+              <div class="pull-right monospace">[{{info_hash}}]</div>
+              <div><b>{{name}}</b></div>
+              <div>[{{state}}] <i class="glyphicon glyphicon-chevron-up"></i> {{upload_rate}}/s <i class="glyphicon glyphicon-chevron-down"></i> {{download_rate}}/s <i class="glyphicon glyphicon-user"></i> {{peers}}; total: {{total_done}}%; requested done: {{progress}}%</div>
+            </li>
+          {{/each}}
+        </ul>
+        {{else}}
+          No torrents.
+        {{/if}}
+      </div>
+    </script>
+
+
+    <script type="template" id="template-spinner">
+      <i class="glyphicon glyphicon-refresh spinner"></i>
+    </script>
+
+    <script type="template" id="template-player">
+      {{#if title}}
+          <img src="{{image.cover_url_small}}" class="img-rounded pull-left" width="30px" height="30px" />
+          <div class="pull-left" style="padding-left:10px; padding-right:10px;">
+            <h3 class="player-song-info" style="display:inline">
+              {{artist}}
+              <small>{{title}}</small>
+            </h3>
+          </div>
+          <audio class="pull-left" src="{{audio_src}}" controls autoplay></audio>
+          <div class="controls pull-left">
+            <button type="button" class="btn btn-default btn-sm shuffle-btn"><i class="glyphicon glyphicon-random"></i></button>
+            <button type="button" class="btn btn-default btn-sm repeat-btn"><i class="glyphicon glyphicon-repeat"></i></button>
+            <button type="button" class="btn btn-default btn-sm prev-btn"><i class="glyphicon glyphicon-step-backward"></i></button>
+            <button type="button" class="btn btn-default btn-sm next-btn"><i class="glyphicon glyphicon-step-forward"></i></button>
+          </div>
+      {{else}}
+          <p class="player-song-info">
+            Play a song...
+          </p>
+      {{/if}}
+    </script>
+
+
+    <!-- jQuery -->
+    <script src="static/js/vendor/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="static/js/vendor/bootstrap.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+
+
+    <script type='text/javascript'>
+    $(document).ready(function() {
+      $('[data-toggle=offcanvas]').click(function() {
+        $('.row-offcanvas').toggleClass('active');
+      });
+    });
+    </script>
+
+    <script src="static/js/vendor/underscore.js"></script>
+    <script src="static/js/vendor/backbone.js"></script>
+    <script src="static/js/vendor/handlebars.js"></script>
+    <script src="static/js/vendor/md5.js"></script>
+    <script src="static/js/vendor/pnglib.js"></script>
+    <script src="static/js/vendor/identicon.js"></script>
+    <script src="static/js/vendor/jquery-sortable.js"></script>
+    <script src="static/js/handlebars_helpers.js"></script>
+    <script src="static/js/models/source.js"></script>
+    <script src="static/js/models/song.js"></script>
+    <script src="static/js/models/playlist.js"></script>
+    <script src="static/js/models/search_results.js"></script>
+    <script src="static/js/models/play_queue.js"></script>
+    <script src="static/js/models/provider.js"></script>
+    <script src="static/js/models/torrent.js"></script>
+    <script src="static/js/views/player.js"></script>
+    <script src="static/js/views/song.js"></script>
+    <script src="static/js/views/playlists.js"></script>
+    <script src="static/js/views/torrents.js"></script>
+    <script src="static/js/views/queue.js"></script>
+    <script src="static/js/views/search.js"></script>
+    <script src="static/js/views/providers.js"></script>
+    <script src="static/js/routes/router.js"></script>
+    <script src="static/js/parallel_queue.js"></script>
+    <script src="static/js/init.js"></script>
+
+
+</body>
+
+</html>
