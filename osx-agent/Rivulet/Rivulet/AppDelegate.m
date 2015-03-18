@@ -13,10 +13,10 @@
 
 NSString* notRunningUIText = @"Server is not running";
 NSString* terminatingUIText = @"Stopping server...";
-NSString* runningUIText = @"Listening on port 3000";
+NSString* runningUIText = @"Listening on port 9074";
 NSString* startServerUIText = @"Start server";
 NSString* stopServerUIText = @"Stop server";
-NSString* portBusyUIText = @"port 3000 is not available";
+NSString* portBusyUIText = @"port 9074 is not available";
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   
@@ -72,7 +72,7 @@ NSString* portBusyUIText = @"port 3000 is not available";
     [serverInfo setTitle:terminatingUIText];
   } else {
     
-    if ([self isPortAvailable:3000]) {
+    if ([self isPortAvailable:9074]) {
       backend = [[NSTask alloc] init];
       
       backend.launchPath = @"/usr/local/bin/rivulet";
@@ -109,7 +109,7 @@ NSString* portBusyUIText = @"port 3000 is not available";
 - (void)openBrowser {
   NSTask *task = [[NSTask alloc] init];
   task.launchPath = @"/usr/bin/open";
-  task.arguments = @[@"http://localhost:3000"];
+  task.arguments = @[@"http://localhost:9074"];
   [task launch];
   [task waitUntilExit];
 }

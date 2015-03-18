@@ -1,8 +1,10 @@
-## What is rivulet.audio?
+# What is rivulet.audio?
 
 rivulet.audio is a new way to acquire and organize music. You create a playlist of songs and it automatically finds "sources" by searching for those songs in torrents. You can share these playlists with anyone and publish them anywhere because the don't contain any copyrighted content or any information about where to get the songs. Once the other user imports your playlist, their client will find torrents to play the songs from.
 
-## OS X Installation
+# Installation
+
+## OS X
 
 1. Open Terminal.app
 
@@ -15,25 +17,36 @@ rivulet.audio is a new way to acquire and organize music. You create a playlist 
 3. Install rivulet from our own tap (Note: We need to have a repo called `homebrew-tap`, and have `rivulet.rb` in it)
 
   ```
+  brew update
   brew install rivuletaudio/tap/rivulet
   ```
 
 4. `rivulet` should be ready to use in terminal
 
-# Debian/Ubuntu Installation
+### Know Issues: 
+1. If you see the following error when running the server in terminal:
+
+  ```
+  Fatal Python error: PyThreadState_Get: no current thread
+  fish: Job 1, 'rivulet' terminated by signal SIGABRT (Abort)
+  ```
+
+  Try to re-install boost-python by executing the following commands:
+
+  ```
+  brew rm boost-python
+  brew install boost-python
+  ```
+
+## Debian/Ubuntu/Linux Mint Installation
 
 ```
 git clone https://github.com/rivuletaudio/rivulet.git
-sudo apt-get install python-libtorrent
-sudo apt-get install flac
-sudo apt-get install lame
-sudo pip2 install BeautifulSoup4
-sudo pip2 install tornado
-sudo pip2 install lxml
-sudo pip2 install pyyaml
+sudo apt-get install -y python-libtorrent python-pip python-lxml flac lame
+sudo pip2 install beautifulsoup4 tornado pyyaml
 ```
 
-# Arch linux installation
+## Arch linux installation
 
 ```
 yaourt rivulet
@@ -54,4 +67,10 @@ or
 python2 server/webserver/webserver.py
 ```
 
-then visit `http://localhost:3000` in your browser.
+then visit `http://localhost:9074` in your browser.
+
+You can change the port and host to bind to with `--port` (or `-p`) and `--host`.
+
+# Config
+
+Copy `server/webserver/config.yaml` to `~/.config/rivulet/config.yaml`. The config file contains documentation about the properties defined in it.

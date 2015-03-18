@@ -11,6 +11,7 @@ import threading
 import thread
 import traceback
 import yaml
+import argparse
 sys.path.append(
     os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
 from server import torrent
@@ -317,9 +318,15 @@ def make_app():
         ])
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--port", help="port number to bind to", type=int, default=9074)
+    parser.add_argument("--host", help="host/ip to bind to", default='127.0.0.1')
+    args = parser.parse_args()
+
+
     app = make_app()
-    app.listen(3000)
-    print "Listening on port 3000"
+    app.listen(args.port, args.host)
+    print "Listening on port", args.port
     try:
         IOLoop.current().start()
     except KeyboardInterrupt, e:
