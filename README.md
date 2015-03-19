@@ -6,6 +6,8 @@ rivulet.audio is a new way to acquire and organize music. You create a playlist 
 
 ## OS X
 
+### Install
+
 1. Open Terminal.app
 
 2. Install homebrew
@@ -14,7 +16,7 @@ rivulet.audio is a new way to acquire and organize music. You create a playlist 
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   ```
 
-3. Install rivulet from our own tap (Note: We need to have a repo called `homebrew-tap`, and have `rivulet.rb` in it)
+3. Install rivulet from rivuletaudio/tap
 
   ```
   brew update
@@ -22,6 +24,13 @@ rivulet.audio is a new way to acquire and organize music. You create a playlist 
   ```
 
 4. `rivulet` should be ready to use in terminal
+
+### Upgrade
+
+```
+brew update
+brew upgrade rivuletaudio/tap/rivulet
+```
 
 ### Know Issues: 
 1. If you see the following error when running the server in terminal:
@@ -44,6 +53,21 @@ rivulet.audio is a new way to acquire and organize music. You create a playlist 
 git clone https://github.com/rivuletaudio/rivulet.git
 sudo apt-get install -y python-libtorrent python-pip python-lxml flac lame
 sudo pip2 install beautifulsoup4 tornado pyyaml
+```
+
+## Windows
+
+Use vagrant to set up a virtual machine:
+
+```
+vagrant up
+```
+
+Then run with:
+
+```
+vagrant ssh
+python2 /vagrant/server/webserver/webserver.py --host 0.0.0.0
 ```
 
 ## Arch linux installation

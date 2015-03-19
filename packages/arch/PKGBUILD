@@ -1,15 +1,15 @@
 # Maintainer: Anonymous <f1586566@trbvm.com>
 
 pkgname=rivulet
-pkgver=0.1.0
+pkgver=0.1.4
 pkgrel=1
 pkgdesc='A music player for torrents'
 arch=('any')
 url="http://rivulet.audio/"
 license=('AGPL')
 depends=('libtorrent-rasterbar' 'python2' 'python2-beautifulsoup4' 'python2-tornado' 'python2-lxml' 'python2-yaml' 'flac' 'lame')
-source=('https://github.com/rivuletaudio/rivulet/archive/v'${pkgver}'.zip')
-sha256sums=('e42a6be6fe8d694e7bb0363c275f8de5cabdaf5e60d7364e583052690a686f5a')
+source=('https://github.com/rivuletaudio/rivulet/archive/v'${pkgver}'.tar.gz')
+sha256sums=('64b063d8a05a9cb8cc5a129665d3fc4f8851c7e29d620872e0391ec64b578f6c')
 
 package() {
   mkdir -p ${pkgdir}/usr/bin/

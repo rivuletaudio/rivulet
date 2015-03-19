@@ -15,10 +15,26 @@ var PlayQueue = Backbone.Model.extend({
       curr = -1;
     }
     songs.add(song, {at: curr + 1});
+    if (song.length > 0) {
+      for (var s in song) {
+        var sng = song[s];
+        sng.download();
+      }
+    } else {
+      song.download();
+    }
   },
   add_last: function(song) {
     var songs = this.get('songs');
     songs.add(song);
+    if (song.length > 0) {
+      for (var s in song) {
+        var sng = song[s];
+        sng.download();
+      }
+    } else {
+      song.download();
+    }
   },
   play_song: function (id) {
     this.set('current', id);

@@ -199,11 +199,14 @@ class DownloadHandler(RequestHandler):
                 tparams = session.torrent_params_from_magnet_link(magnet)
             elif infohash is not None:
                 tparams = session.torrent_params_from_info_hash(infohash)
-            #TODO: unicode safety
             try:
                 print "About to start download:", path
-
-                thread.start_new_thread(lambda: torrent.TorrentStream(session, tparams, path, 0, None, False), ())
+                def thread_func():
+                    downloader = torrent.TorrentStream(session, tparams, path, 0, None, False)
+                    for kind, data in downloader.data():
+                        # TODO: wait for the metadata only
+                        print "got data from download request..."
+                thread.start_new_thread(thread_func, ())
 
             except Exception as e:
                 self.on_error(e)
@@ -278,8 +281,6 @@ class SearchHandler(RequestHandler):
         self.finish()
 
 class SourcesHandler(RequestHandler):
-    search_results_max = 10
-
     # ?artist=&title=&provider_id=
     @gen.coroutine
     def get(self):

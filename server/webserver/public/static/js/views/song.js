@@ -1,5 +1,6 @@
 var SongView = Backbone.View.extend({
   tagName: 'li',
+  className: 'sortable',
 
   events: {
     'click .play-link':                  'play_song',
