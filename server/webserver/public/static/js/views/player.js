@@ -24,6 +24,10 @@ var PlayerView = Backbone.View.extend({
         var play_link = this.model.current_song().make_link('play');
         var data = this.model.current_song().toJSON();
         data.audio_src = play_link;
+        // unique images for missing album art
+        if (!data.image || !data.image.cover_url_small) {
+          data.identicon = new Identicon(md5(data.artist + ' - ' + data.title), 34).toString();
+        }
         
         if (this.player) {
           this.player.pause();

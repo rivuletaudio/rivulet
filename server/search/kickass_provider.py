@@ -9,13 +9,7 @@ import urllib
 import re
 
 class KickassProvider(TorrentSearchProvider):
-    def __init__(self):
-        self.search_cache = {}
-        self.file_cache = {}
-
-    def search(self, query):
-        if self.search_cache.has_key(query):
-            return self.search_cache[query]
+    def search_torrent(self, query):
         #TODO: can we use the same async http client for all requests?
         http_client = AsyncHTTPClient()
         url = 'https://kickass.to/usearch/' +\
@@ -24,7 +18,6 @@ class KickassProvider(TorrentSearchProvider):
         print 'requesting', url
         request = HTTPRequest(url)
         result_future = http_client.fetch(request, raise_error=False)
-        self.search_cache[query] = result_future
         return result_future
 
     def parse_search(self, response, artist):
@@ -64,16 +57,12 @@ class KickassProvider(TorrentSearchProvider):
             })
         return torrents
 
-    def file_list(self, song):
-        info_link = song['info_link']
-        if self.file_cache.has_key(info_link):
-            return self.file_cache[info_link]
+    def file_list(self, info_link):
         # get the file listings for the torrent
         http_client = AsyncHTTPClient()
         print 'requesting file list', info_link
         request = HTTPRequest(info_link, method='POST', body='all=1')
         result_future = http_client.fetch(request, raise_error=False)
-        self.file_cache[info_link] = result_future
         return result_future
 
     def parse_file_list(self, response):

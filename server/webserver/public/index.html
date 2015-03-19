@@ -192,9 +192,9 @@
                   <ul class="dropdown-menu">
                     {{#each sources}}
                       {{#ifCond ../selected_source_id '===' @index}}
-                        <li class="active"><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                        <li class="active" ><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
                       {{else}}
-                        <li><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                        <li><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
                       {{/ifCond}}
                     {{/each}}
                   </ul>
@@ -237,19 +237,6 @@
 
     <script type="template" id="template-search-results-song">
       <div class="song" data-pos="{{meta.pos}}">
-        {{#if sources}}
-          <div class="progress progress-thin">
-            {{#each pieces}}
-              {{#if this}}
-                <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{../../pb_widths}}%;"></div>
-              {{else}}
-                {{#if ../../../requested}}
-                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{../../../pb_widths}}%;"></div>
-                {{/if}}
-              {{/if}}
-            {{/each}}
-          </div>
-        {{/if}}
         {{#if image.cover_url_small}}
           <img height="34px" width="34px" src="{{image.cover_url_small}}"/>
         {{else}}
@@ -302,9 +289,9 @@
                   <ul class="dropdown-menu">
                     {{#each sources}}
                       {{#ifCond ../selected_source_id '===' @index}}
-                        <li class="active"><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                        <li class="active" ><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
                       {{else}}
-                        <li><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                        <li><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
                       {{/ifCond}}
                     {{/each}}
                   </ul>
@@ -334,6 +321,20 @@
           
         {{artist}} - {{title}}
         <i class="glyphicon glyphicon-refresh spinner sources-spinner" style="display:none"></i>
+
+        {{#if sources}}
+          <div class="progress progress-thin">
+            {{#each pieces}}
+              {{#if this}}
+                <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{../../pb_widths}}%;"></div>
+              {{else}}
+                {{#if ../../../requested}}
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{../../../pb_widths}}%;"></div>
+                {{/if}}
+              {{/if}}
+            {{/each}}
+          </div>
+        {{/if}}
       </div>
     </script>
 
@@ -451,19 +452,6 @@
 
     <script type="template" id="template-playlist-song">
       <div class="song" data-pos="{{meta.pos}}">
-        {{#if sources}}
-          <div class="progress progress-thin">
-            {{#each pieces}}
-              {{#if this}}
-                <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{../../pb_widths}}%;"></div>
-              {{else}}
-                {{#if ../../../requested}}
-                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{../../../pb_widths}}%;"></div>
-                {{/if}}
-              {{/if}}
-            {{/each}}
-          </div>
-        {{/if}}
         {{#if image.cover_url_small}}
           <img height="34px" width="34px" src="{{image.cover_url_small}}"/>
         {{else}}
@@ -499,9 +487,9 @@
                   <ul class="dropdown-menu">
                     {{#each sources}}
                       {{#ifCond ../selected_source_id '===' @index}}
-                        <li class="active"><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                        <li class="active" ><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
                       {{else}}
-                        <li><a href="#" class="source-selector" data-index="{{@index}}"> {{torrent_title}} / {{path}}</a></li>
+                        <li><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
                       {{/ifCond}}
                     {{/each}}
                   </ul>
@@ -539,6 +527,19 @@
           
         {{artist}} - {{title}}
         <i class="glyphicon glyphicon-refresh spinner sources-spinner" style="display:none"></i>
+        {{#if sources}}
+          <div class="progress progress-thin">
+            {{#each pieces}}
+              {{#if this}}
+                <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{../../pb_widths}}%;"></div>
+              {{else}}
+                {{#if ../../../requested}}
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{../../../pb_widths}}%;"></div>
+                {{/if}}
+              {{/if}}
+            {{/each}}
+          </div>
+        {{/if}}
       </div>
     </script>
 
@@ -568,7 +569,11 @@
 
     <script type="template" id="template-player">
       {{#if title}}
-          <img src="{{image.cover_url_small}}" class="img-rounded pull-left" width="30px" height="30px" />
+          {{#if image.cover_url_small}}
+            <img src="{{image.cover_url_small}}" class="img-rounded pull-left" width="28px" height="28px" />
+          {{else}}
+            <img src="data:image/png;base64,{{identicon}}" class="img-rounded pull-left" width="24px" height="24px" />
+          {{/if}}
           <div class="pull-left" style="padding-left:10px; padding-right:10px;">
             <h3 class="player-song-info" style="display:inline">
               {{artist}}

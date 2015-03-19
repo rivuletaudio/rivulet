@@ -397,6 +397,9 @@ class Session:
 
     def torrent_params_from_magnet_link(self, mag_link):
         res = lt.parse_magnet_uri(mag_link)
+        # DAMN YOU LIBTORRENT
+        res['info_hash'] = hex_to_hash(str(res['info_hash']).decode('hex'))
+
         res["save_path"] = self.torrent_data_path
         return res
 

@@ -37,6 +37,7 @@ var QueueView = Backbone.View.extend({
         $ul.append(songView.el);
       }.bind(this));
       $ul.sortable({
+        itemSelector: 'li.sortable',
         placeholder: '<li class="placeholder song" style="height:35px"></li>',
         vertical: false,
         nested: false,
