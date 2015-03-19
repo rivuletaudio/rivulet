@@ -42,10 +42,6 @@ class ThePirateBayProvider(TorrentSearchProvider):
             # The name of the artist must be in the torrent name
             if title.lower().find(artist.lower()) == -1:
                 continue
-            # fuck flac (sorry for any artist or songs that include flac)
-            # TODO: do this filter at the filename level
-            if title.lower().find('flac') != -1:
-                continue
             top_magnet = tr.findAll('a', {'title':re.compile('^Download this torrent using magnet$')})[0]['href']
             top_torrent_link = None
             torrent_links = tr.findAll('a', {'title':re.compile('^Download this torrent$')})
