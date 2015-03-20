@@ -4,6 +4,14 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>Resources/AppIcon.icns</key>
+		<data>
+		ntceNRa4hbdQkxgdTd5WCKzGFkU=
+		</data>
+		<key>Resources/Assets.car</key>
+		<data>
+		ECKL9kq9KmozIW8KsocjiSN/vmk=
+		</data>
 		<key>Resources/Base.lproj/MainMenu.nib</key>
 		<dict>
 			<key>hash</key>
@@ -16,6 +24,14 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Resources/AppIcon.icns</key>
+		<data>
+		ntceNRa4hbdQkxgdTd5WCKzGFkU=
+		</data>
+		<key>Resources/Assets.car</key>
+		<data>
+		ECKL9kq9KmozIW8KsocjiSN/vmk=
+		</data>
 		<key>Resources/Base.lproj/MainMenu.nib</key>
 		<dict>
 			<key>hash</key>

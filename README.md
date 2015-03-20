@@ -23,7 +23,7 @@ rivulet.audio is a new way to acquire and organize music. You create a playlist 
   brew install rivuletaudio/tap/rivulet
   ```
 
-4. `rivulet` should be ready to use in terminal
+4. `rivulet` can be executed from terminal or by running `/Applications/Rivulet.app`
 
 ### Upgrade
 

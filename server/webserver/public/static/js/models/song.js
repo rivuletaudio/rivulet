@@ -1,4 +1,7 @@
 var Song = Backbone.Model.extend({
+  initialize: function() {
+    this.source_spinner_counter = 0;
+  },
   defaults: function() {
     return {
       title: 'Untitled',
@@ -56,6 +59,48 @@ var Song = Backbone.Model.extend({
     }
   },
 
+  sources_search_common: function(cb, force) {
+    if (this.get_song_sources().get('sources').length && !force) {
+      if (cb) cb();
+      return;
+    }
+
+    var tryShowSpinner = function() {
+      if (this.source_spinner_counter === 0) {
+        this.set('spinner', true);
+      }
+      this.source_spinner_counter++;
+    }.bind(this);
+
+    var tryHideSpinner = function() {
+      this.source_spinner_counter--;
+      if (this.source_spinner_counter === 0) {
+        this.set('spinner', false);
+        if (cb) cb();
+      }
+    }.bind(this);
+
+    // find more sources
+    App.providers.each(function(provider) {
+      if (provider.get('selected')) {
+        tryShowSpinner();
+        $.get('/sources',
+              { artist: this.get('artist'),
+                title: this.get('title'),
+                provider_id: provider.get('index')
+              }).success(function(data){
+          var json = JSON.parse(data);
+          var sources = json.result;
+          this.add_sources(sources);
+          tryHideSpinner();
+        }.bind(this)).error(function(){
+          console.log('error');
+          tryHideSpinner();
+        }.bind(this));
+      }
+    }, this);
+  },
+
   make_link: function(url){
     var source = this.get_song_sources().get_selected_source();
     if (source) {
@@ -77,12 +122,16 @@ var Song = Backbone.Model.extend({
     return type+'='+encodeURIComponent(src)+'&path='+encodeURIComponent(path)
   },
 
-  download: function() {
-    $.get(this.make_link('download')).success(function() {
-      this.set('downloading', true);
-    }.bind(this)).error(function(){
-      this.set('downloading', false);
-    }.bind(this));
+  download: function(force) {
+    var source = this.get_song_sources().get_selected_source();
+    if (!source.get('downloading') || force) {
+      source.set('downloading', true);
+      $.get(this.make_link('download')).success(function() {
+        //nop, we already set it to downloading
+      }.bind(this)).error(function(){
+        source.set('downloading', false);
+      }.bind(this));
+    }
   }
 
 });

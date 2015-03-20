@@ -1,14 +1,47 @@
 var QueueView = Backbone.View.extend({
   song_template: Handlebars.compile($('#template-queue-song').html()),
+  placeholder_template: Handlebars.compile($('#template-placeholder-song').html()),
 
   initialize: function() {
     if (this.model) {
       this.listenTo(this.model.get('songs'), "change add remove reset swap", this.render);
       this.listenTo(this.model, "change", this.render);
-      this.listenTo(App.playlists, "change", this.render);
     }
     this.songViews = [];
     this.render();
+  },
+
+  // check if we are in radio mode and ready to take the next song into the queue
+  add_queued_song_if_ready: function(){
+    console.log('[] ready?');
+    var curr = this.model.get('current');
+    var songs = this.model.get('songs');
+    var last = songs.length-1;
+    if (last == -1) {
+      console.log('[] no songs');
+      return;
+    }
+    var model = this.model;
+    var radio = model.get('radio');
+    if (radio) {
+      console.log('[] is in radio mode');
+      var radio_song = model.get('radio-song');
+      // is there a radio song?
+      if (radio_song) {
+        console.log('[] has radio song');
+        var sources = model.get('radio-song').get_song_sources();
+        // are we ready for the song?
+        if (curr == last) {
+          console.log('[] curr is last');
+          // is the song ready for us?
+          if (sources && sources.get('sources').length) {
+            console.log('[] sources avaiable');
+            this.model.add_last(radio_song);
+            this.model.trigger('next_song_request');
+          }
+        }
+      }
+    }
   },
 
   render: function() {
@@ -16,6 +49,9 @@ var QueueView = Backbone.View.extend({
       this.songViews[i].remove();
     }
     var curr = this.model.get('current');
+
+    this.add_queued_song_if_ready();
+
     var $ul = this.$el.find('ul.queue-songs');
     $ul.empty();
     var songs = this.model.get('songs');
@@ -36,6 +72,7 @@ var QueueView = Backbone.View.extend({
         this.songViews.push(songView);
         $ul.append(songView.el);
       }.bind(this));
+
       $ul.sortable({
         itemSelector: 'li.sortable',
         placeholder: '<li class="placeholder song" style="height:35px"></li>',
@@ -51,22 +88,30 @@ var QueueView = Backbone.View.extend({
           var from = $item.find('div.song').attr('data-pos');
 
           // A song has been moved from 'from' to 'to'
-          // we make the first few changes silently and only the last one triggers a re-draw
-          var songs = this.model.get('songs');
-          var song = songs.at(from);
-          songs.remove(song, {silent: true});
-          // if we move the current song, we need to update the position of the current song
-          var current = this.model.get('current');
-          if (from < current && to >= current) {
-            this.model.set('current', current - 1, {silent: true});
-          } else if (from > current && to <= current) {
-            this.model.set('current', current + 1, {silent: true});
-          } else if (from == current) {
-            this.model.set('current', to, {silent: true});
-          }
-          songs.add(song, {at: to});
+          this.model.move_from_to(from, to);
         }.bind(this)
       });
+    }
+
+    if (this.model.get('radio')) {
+      console.log('radio-song', this.model.get('radio-song'));
+      var song = this.model.get('radio-song');
+      if (song) {
+          if (this.placeholderSongView) {
+            this.placeholderSongView.remove();
+          }
+
+          var songView = new SongView({
+            template: this.placeholder_template, 
+            model: song
+          });
+          this.placeholderSongView = songView;
+          var li = this.placeholderSongView.el;
+          $ul.append(li);
+          $(li).removeClass('sortable');
+      } else {
+        $ul.append('<li><div class="song"><p><i class="glyphicon glyphicon-refresh spinner big-spinner"></i></p></div></li>"');
+      }
     }
   }
 });

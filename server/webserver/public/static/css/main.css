@@ -98,6 +98,9 @@ audio {
     -moz-animation:spin 4s linear infinite;
     animation:spin 4s linear infinite;
 }
+.big-spinner {
+  font-size: 65px;
+}
 
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
@@ -141,15 +144,24 @@ audio {
   padding-left: 5px;
   margin-top: 0;
   width: 90px;
-  height: 130px;
+  /*height: 130px;*/
   position: relative;
   color: #fff;
 }
 .queue-songs .current-song {
 	background-color: #333;
 }
+.queue-songs .song-placeholder {
+	background-color: #666;
+}
+.transparent {
+  opacity: 0.5;
+}
+.queue-songs .song.song-placeholder {
+  color: #CCC;
+}
 .queue-songs .song>li {
-  height:130px;
+  /*height:130px;*/
 }
 .queue-songs .song .main-action {
   position:absolute;
@@ -187,6 +199,9 @@ audio {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.queue-songs .song .loading-text {
+  white-space: normal;
+}
 
 .queue-scroller {
   overflow-x: scroll;
@@ -223,4 +238,7 @@ li.placeholder {
 li.placeholder:before {
   position: absolute;
   /** Define arrowhead **/
+}
+.toggle-radio-button {
+  margin-right: 10px;
 }

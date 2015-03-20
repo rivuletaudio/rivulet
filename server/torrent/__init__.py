@@ -10,6 +10,8 @@ import json
 import os
 import base64
 import errno
+from tornado.httpclient import AsyncHTTPClient
+from tornado.httpclient import HTTPRequest
 from StringIO import StringIO
 import gzip
 from distutils.version import StrictVersion
@@ -248,20 +250,20 @@ class Session:
             ts = th.status()
             pieces = ts.pieces
             ti = get_torrent_info(th)
-            info_hash = str(ti.info_hash())
             torrent_status = {}
-            torrent_status['info_hash'] = info_hash
             torrent_status['state'] = str(lt.torrent_status.states.values[ts.state])
             torrent_status['download_rate'] = ts.download_rate
             torrent_status['upload_rate'] = ts.upload_rate
             torrent_status['progress'] = round(ts.progress * 100, 2)
-            torrent_status['total_done'] = round(float(ts.total_done) / ti.total_size() * 100, 2)
             torrent_status['peers'] = ts.num_peers
             torrent_status['num_pieces'] = ts.num_pieces
             torrent_status['num_complete'] = ts.num_complete
             torrent_status['files'] = []
             if ti == None:
                 continue
+            info_hash = str(ti.info_hash())
+            torrent_status['total_done'] = round(float(ts.total_done) / ti.total_size() * 100, 2)
+            torrent_status['info_hash'] = info_hash
             torrent_status['name'] = ti.name()
             if not detailed:
                 torrent_statuses.append(torrent_status)
@@ -293,9 +295,9 @@ class Session:
             ts = th.status()
             pieces = ts.pieces
             ti = get_torrent_info(th)
-            info_hash = str(ti.info_hash())
             if ti == None:
                 continue
+            info_hash = str(ti.info_hash())
             for index in range(ti.num_files()):
                 file_ = ti.file_at(index)
 
@@ -309,7 +311,7 @@ class Session:
                 # I don't know why we need -1; we shouldn't need it.
                 end = ti.map_file(index, file_size-1, 0)
 
-                if reduce(lambda a,b: a and b, pieces[start.piece:end.piece+1]):
+                if reduce(lambda a,b: a and b, pieces[start.piece:end.piece+1], True):
                     if info_hash not in sources.keys():
                         sources[info_hash] = {}
                     sources[info_hash][path] = True
@@ -416,32 +418,29 @@ class Session:
             "dht_nodes": []
         }
 
-    # WARNING: blocking network call
-    def torrent_params_from_torrent_url(self, torrent_url):
-        def get_url(url):
-            request = urllib2.Request(url)
-            request.add_header('Accept-encoding', 'gzip')
-            response = urllib2.urlopen(request)
-            if response.info().get('Content-Encoding') == 'gzip':
-                buf = StringIO( response.read())
-                f = gzip.GzipFile(fileobj=buf)
-                data = f.read()
-            else:
-                data = response.read()
-            return data
+    def torrent_params_from_torrent_url(self, torrent_url, on_result):
+        http_client = AsyncHTTPClient()
+        print 'requesting torrent file from', torrent_url
+        request = HTTPRequest(torrent_url)
 
-        torrent_info = bytes_to_ti(get_url(torrent_url))
-        return {
-            "storage_mode": DEFAULT_STORAGE_MODE,
-            "source_feed_url": "",
-            "ti": torrent_info,
-            "url": '',
-            "info_hash": ti_to_hash(torrent_info),
-            "save_path": self.torrent_data_path,
-            "trackers": [],
-            "uuid": "",
-            "dht_nodes": []
-        }
+        def on_data(res):
+            if (res.error):
+                raise res.error
+
+            torrent_info = bytes_to_ti(res.body)
+            on_result({
+                "storage_mode": DEFAULT_STORAGE_MODE,
+                "source_feed_url": "",
+                "ti": torrent_info,
+                "url": '',
+                "info_hash": ti_to_hash(torrent_info),
+                "save_path": self.torrent_data_path,
+                "trackers": [],
+                "uuid": "",
+                "dht_nodes": []
+            })
+
+        http_client.fetch(request, callback=on_data)
 
 
 class StreamerInfo:

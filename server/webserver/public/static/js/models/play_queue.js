@@ -37,7 +37,10 @@ var PlayQueue = Backbone.Model.extend({
     }
   },
   play_song: function (id) {
-    this.set('current', id);
+    // force the event
+    this.set('current', id, {silent: true});
+    this.trigger('change');
+    this.trigger('change:current');
   },
   play_prev: function () {
     var curr = this.get('current');
@@ -112,6 +115,14 @@ var PlayQueue = Backbone.Model.extend({
           break;
         }
       }
+      // move the song up in the list if it's from the future
+      if (next > current+1) {
+        this.move_from_to(next, current+1);
+        next = current+1;
+      } else if (current != last && next < current) {
+        this.move_from_to(next, current);
+        next = current;
+      }
       this.play_song(next);
     }
   },
@@ -166,5 +177,21 @@ var PlayQueue = Backbone.Model.extend({
     }
    
     songs.remove(songs.at(id));
+  },
+  move_from_to: function(from, to) {
+    // we make the first few changes silently and only the last one triggers a re-draw
+    var songs = this.get('songs');
+    var song = songs.at(from);
+    songs.remove(song, {silent: true});
+    // if we move the current song, we need to update the position of the current song
+    var current = this.get('current');
+    if (from < current && to >= current) {
+      this.set('current', current - 1, {silent: true});
+    } else if (from > current && to <= current) {
+      this.set('current', current + 1, {silent: true});
+    } else if (from == current) {
+      this.set('current', to, {silent: true});
+    }
+    songs.add(song, {at: to});
   }
 });

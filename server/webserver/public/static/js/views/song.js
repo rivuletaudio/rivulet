@@ -6,6 +6,7 @@ var SongView = Backbone.View.extend({
     'click .play-link':                  'play_song',
     'click .add-play-link':              'add_play_song',
     'click .sources-search':             'sources_search',
+    'click .sources-refresh':            'sources_refresh',
     'click .add-next-link':              'add_next_song',
     'click .add-last-link':              'add_last_song',
     'click .make-offline-link':          'make_offline',
@@ -25,11 +26,11 @@ var SongView = Backbone.View.extend({
   initialize: function(params) {
     this.template = params.template;
     this.meta = params.meta;
-    this.source_spinner_counter = 0;
     if (this.model) {
       this.listenTo(this.model.get_song_sources(), "add change reset", this.render);
       this.listenTo(this.model.get_song_sources().get('sources'), "add change reset", this.render);
       this.listenTo(this.model, "change", this.render);
+      this.listenTo(App.playlists, "change add remove", this.render);
     }
     this.statusInterval = setInterval(this.check_status.bind(this), 10000);
     this.check_status();
@@ -43,12 +44,28 @@ var SongView = Backbone.View.extend({
   },
 
   render: function() {
+    console.log('song render');
     var model = this.model.toJSON();
 
     var song_sources = this.model.get_song_sources();
     var sources  = song_sources.get('sources');
     var selected_id = song_sources.get('selected_id');
     model.sources = sources.length > 0 ? sources.toJSON() : undefined;
+
+    var selected_source = song_sources.get_selected_source();
+    if (selected_source) {
+      model.downloading = selected_source.get('downloading');
+    }
+    
+    // extract file name from path for all sources
+    _.each(model.sources, function(source) {
+      var parts = source.path.split('/');
+      if (parts.length > 0) {
+        var filename = parts[parts.length-1];
+        source.filename = filename;
+      }
+    });
+    
     model.selected_source_id = selected_id;
     model.meta = this.meta;
 
@@ -75,8 +92,12 @@ var SongView = Backbone.View.extend({
       this.check_status();
     }
 
-    if (this.source_spinner_counter > 0) {
+    if (this.model.get('spinner')) {
       this.$el.find('.sources-spinner').show();
+      this.$el.find('.sources-img-indicator').addClass('transparent');
+    } else {
+      this.$el.find('.sources-spinner').hide();
+      this.$el.find('.sources-img-indicator').removeClass('transparent');
     }
   },
 
@@ -107,74 +128,35 @@ var SongView = Backbone.View.extend({
     App.play_queue.add_next(song);
     App.play_queue.play_next();
   },
+
+  sources_refresh: function(e) {
+    e.preventDefault();
+    this.model.sources_search_common(false, true);
+  },
   
   sources_search: function(e, cb){
     if (e) {
       e.preventDefault();
     }
-    if (this.model.get_song_sources().get('sources').length) {
-      if (cb) cb();
-      return;
-    }
-    var $this = this.$el;
-    var song = this.model;
 
-    var tryShowSpinner = function() {
-      if (this.source_spinner_counter === 0) {
-        // spinner
-        $this.find('.sources-spinner').show();
-      }
-      this.source_spinner_counter++;
-    }.bind(this);
-    
-    var tryHideSpinner = function() {
-      this.source_spinner_counter--;
-      if (this.source_spinner_counter === 0) {
-        $this.find('.sources-spinner').hide();
-        if (cb) cb();
-      }
-    }.bind(this);
-    
-    // find more sources
-    App.providers.each(function(provider) {
-      if (provider.get('selected')) {
-        tryShowSpinner();
-        $.get('/sources',
-              { artist: song.get('artist'),
-                title: song.get('title'),
-                provider_id: provider.get('index')
-              }).success(function(data){
-          var json = JSON.parse(data);
-          var sources = json.result;
-          song.add_sources(sources);
-          tryHideSpinner();
-        }).error(function(){
-          console.log('error');
-          tryHideSpinner();
-        });
-      }
-    }, this);
+    this.model.sources_search_common(cb, false);
   },
 
   add_next_song: function(e){
     e.preventDefault();
-    // TODO: check if it's already downloading first
-    this.model.download();
     var song = new Song(this.model.toJSON());
     App.play_queue.add_next(song);
   },
 
   add_last_song: function(e){
     e.preventDefault();
-    // TODO: check if it's already downloading first
-    this.model.download();
     var song = new Song(this.model.toJSON());
     App.play_queue.add_last(song);
   },
 
   make_offline: function(e){
     e.preventDefault();
-    this.model.download();
+    this.model.download(true);
   },
 
   download: function(e) {

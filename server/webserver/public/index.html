@@ -10,7 +10,7 @@
     <meta name="author" content="">
 
     <title>rivulet.audio</title>
-
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
     <!-- Bootstrap Core CSS -->
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
 
@@ -42,7 +42,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="#">rivulet.audio</a>
+              <a class="navbar-brand" href="#"><img src="/static/img/icon.png" width="25px" height="25px" style="display:inline"/> rivulet.audio</a>
 
               <div class="col-xs-5 pull-right">
                 <form class="navbar-form pull-right" id="search-bar-form" role="search">
@@ -64,6 +64,9 @@
           <!-- sidebar -->
           <div class="col-xs-6 col-sm-2 sidebar-offcanvas" id="sidebar" role="navigation">
             <ul class="nav nav-pills nav-stacked nav-buttons">
+                <li>
+                    <a href="#explore" id="tab-title-explore">Explore</a>
+                </li>
                 <li>
                     <a href="#search" id="tab-title-search">Search</a>
                 </li>
@@ -95,6 +98,7 @@
   </div><!--/.page-container-->
 
   <footer class="footer footer-fixed-bottom">
+    <div id="queue-control"></div>
     <div id="player" class="player-main">...</div>
     <div id="queue">
       <div class="queue-scroller">
@@ -118,7 +122,33 @@
       </div>
       {{/each}}
     </script>
-    
+
+    <script type="template" id="template-explore">
+      <h1>Recommended Playlists</h1>
+      <p>Here are some playlists you might want to try to get you started. Click on any of them to import them. Then go to your playlists tab to play them.</p>
+      <div id="recommended-playlists">
+        <ul class="list-unstyled">
+          {{#each playlists}}
+          <li>
+            {{#if added}}
+              <button type="button" class="btn btn-xs btn-success" disabled><i class="glyphicon glyphicon-plus"></i></button>
+            {{else}}
+              <button type="button" class="btn btn-xs btn-success add-playlist-link" data-id="{{@index}}"><i class="glyphicon glyphicon-plus"></i></button>
+            {{/if}}
+            <b>{{title}}</b>
+            <ul class="list-unstyled">
+              {{#each songs}}
+              <li>
+                {{artist}} - {{title}}
+              </li>
+              {{/each}}
+            </ul>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    </script>
+
     <script type="template" id="template-search">
       <h1>Search Results</h1>
       <div id="search-results">
@@ -134,11 +164,10 @@
       <div class="song" data-pos="{{meta.pos}}">
       {{/if}}
         {{#if image.cover_url_medium}}
-          <img class="album-art" src="{{image.cover_url_medium}}"/>
+          <img class="album-art sources-img-indicator" src="{{image.cover_url_medium}}"/>
         {{else}}
-          <img class="album-art" src="data:image/png;base64,{{identicon}}">
+          <img class="album-art sources-img-indicator" src="data:image/png;base64,{{identicon}}">
         {{/if}}
-        <i class="glyphicon glyphicon-refresh spinner sources-spinner" style="display:none"></i>
         {{#if sources}}
           <div class="progress progress-thin">
             {{#each pieces}}
@@ -186,22 +215,35 @@
               </li>
               
               <li class="divider"></li>
-              {{#if sources}}
-                <li class="dropdown-submenu">
-                  <a href="#"> Sources </a>
-                  <ul class="dropdown-menu">
-                    {{#each sources}}
-                      {{#ifCond ../selected_source_id '===' @index}}
-                        <li class="active" ><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
-                      {{else}}
-                        <li><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
-                      {{/ifCond}}
-                    {{/each}}
-                  </ul>
-                </li>
-              {{else}}
-                <li class="disabled"><a> Sources </a>
-              {{/if}}
+              <li><a class="sources-refresh" href="#">Search Sources</a></li>
+              <li class="dropdown-submenu">
+                <a href="#"> Sources </a>
+                <ul class="dropdown-menu">
+
+                  {{#each sources}}
+                    {{#ifCond ../selected_source_id '===' @index}}
+                      <li class="active" style="width:600px;">
+                        <a href="#" class="source-selector" data-index="{{@index}}" style="white-space:normal;"> 
+                          <strong>{{filename}}</strong>
+                          <small>({{torrent_title}})</small> 
+                          <br> 
+                          <small>{{path}}</small>
+                        </a>
+                      </li>
+                    {{else}}
+                      <li style="width:600px;">
+                        <a href="#" class="source-selector" data-index="{{@index}}" style="white-space:normal"> 
+                          <strong>{{filename}}</strong>
+                          <small>({{torrent_title}})</small> 
+                          <br>
+                          <small>{{path}}</small>
+                        </a>
+                      </li>
+                    {{/ifCond}}
+                  {{/each}}
+
+                </ul>
+              </li>
               <li class="divider"></li>
                 
               {{#ifCond percent-dl '<' 100 }}
@@ -221,7 +263,7 @@
                 <li><a class="move-song-down-in-queue" href="#">Move Song Down</a></li>
               {{/unless}}
               <li class="divider"></li>
-              <li><a class="remove-song-in-queue" href="#">Remove from playlist</a></li>
+              <li><a class="remove-song-in-queue" href="#">Remove from Queue</a></li>
             </ul>
           </div>
         {{else}}
@@ -283,22 +325,35 @@
               </li>
              
               <li class="divider"></li>
-              {{#if sources}}
-                <li class="dropdown-submenu">
-                  <a href="#"> Sources </a>
-                  <ul class="dropdown-menu">
-                    {{#each sources}}
-                      {{#ifCond ../selected_source_id '===' @index}}
-                        <li class="active" ><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
-                      {{else}}
-                        <li><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
-                      {{/ifCond}}
-                    {{/each}}
-                  </ul>
-                </li>
-              {{else}}
-                <li class="disabled"><a> Sources </a>
-              {{/if}}
+              <li><a class="sources-refresh" href="#">Search Sources</a></li>
+              <li class="dropdown-submenu">
+                <a href="#"> Sources </a>
+                <ul class="dropdown-menu">
+
+                  {{#each sources}}
+                    {{#ifCond ../selected_source_id '===' @index}}
+                      <li class="active" style="width:600px;">
+                        <a href="#" class="source-selector" data-index="{{@index}}" style="white-space:normal;"> 
+                          <strong>{{filename}}</strong>
+                          <small>({{torrent_title}})</small> 
+                          <br> 
+                          <small>{{path}}</small>
+                        </a>
+                      </li>
+                    {{else}}
+                      <li style="width:600px;">
+                        <a href="#" class="source-selector" data-index="{{@index}}" style="white-space:normal"> 
+                          <strong>{{filename}}</strong>
+                          <small>({{torrent_title}})</small> 
+                          <br>
+                          <small>{{path}}</small>
+                        </a>
+                      </li>
+                    {{/ifCond}}
+                  {{/each}}
+                      
+                </ul>
+              </li>
               <li class="divider"></li>
                 
               {{#ifCond percent-dl '<' 100 }}
@@ -450,6 +505,22 @@
       </div>
     </script>
 
+    <script type="template" id="template-placeholder-song">
+      {{#if sources}}
+        <div class="song song-placeholder">
+      {{else}}
+        <div class="song song-placeholder transparent">
+      {{/if}}
+        {{#if image.cover_url_medium}}
+          <img class="album-art" src="{{image.cover_url_medium}}"/>
+        {{else}}
+          <img class="album-art" src="data:image/png;base64,{{identicon}}">
+        {{/if}}
+        <div class="artist text-center">{{artist}}</div>
+        <div class="title text-center">{{title}}</div>
+      </div>
+    </script>
+
     <script type="template" id="template-playlist-song">
       <div class="song" data-pos="{{meta.pos}}">
         {{#if image.cover_url_small}}
@@ -481,22 +552,35 @@
                 <li><a class="add-next-link" href="#">Add Next</a></li>
               {{/ifCond}}
               <li class="divider"></li>
-               {{#if sources}}
-                <li class="dropdown-submenu">
-                  <a href="#"> Sources </a>
-                  <ul class="dropdown-menu">
-                    {{#each sources}}
-                      {{#ifCond ../selected_source_id '===' @index}}
-                        <li class="active" ><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
-                      {{else}}
-                        <li><a href="#" class="source-selector" data-index="{{@index}}"> <strong>{{torrent_title}}</strong> <br> <small>{{path}}</small></a></li>
-                      {{/ifCond}}
-                    {{/each}}
-                  </ul>
-                </li>
-              {{else}}
-                <li class="disabled"><a> Sources </a>
-              {{/if}}
+              <li><a class="sources-refresh" href="#">Search Sources</a></li>
+              <li class="dropdown-submenu">
+                <a href="#"> Sources </a>
+                <ul class="dropdown-menu">
+                  
+                  {{#each sources}}
+                    {{#ifCond ../selected_source_id '===' @index}}
+                      <li class="active" style="width:600px;">
+                        <a href="#" class="source-selector" data-index="{{@index}}" style="white-space:normal;"> 
+                          <strong>{{filename}}</strong>
+                          <small>({{torrent_title}})</small> 
+                          <br> 
+                          <small>{{path}}</small>
+                        </a>
+                      </li>
+                    {{else}}
+                      <li style="width:600px;">
+                        <a href="#" class="source-selector" data-index="{{@index}}" style="white-space:normal"> 
+                          <strong>{{filename}}</strong>
+                          <small>({{torrent_title}})</small> 
+                          <br>
+                          <small>{{path}}</small>
+                        </a>
+                      </li>
+                    {{/ifCond}}
+                  {{/each}}
+
+                </ul>
+              </li>
               <li class="divider"></li>
 
               {{#ifCond percent-dl '<' 100 }}
@@ -567,6 +651,37 @@
       <i class="glyphicon glyphicon-refresh spinner"></i>
     </script>
 
+    <script type="template" id="template-queue-control">
+      <div class="pull-left dropdown-action dropup" style="padding-right:10px;">
+        <button type="button" class="btn btn-xs btn-default dropdown-toggle dropdown-hack-button" data-toggle="dropdown" aria-expanded="false">
+          Queue <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu multi-level dropdown-hack-menu" role="menu">
+         <li class="dropdown-submenu">
+           <a href="#"> Add to Playlist </a>
+            <ul class="dropdown-menu">
+              {{#if playlists}}
+                {{#each playlists}}
+                  <li><a href="#" class="add-queue-to-playlist" playlist-id="{{@index}}"> {{title}}</a></li>
+                {{/each}}
+                <li class="divider"></li>
+                <li><a href="#" class="add-queue-to-new-playlist"> New Playlist </a></li>
+              {{else}}
+                <li><a href="#" class="add-queue-to-new-playlist"> New Playlist </a></li>
+              {{/if}}
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="pull-left">
+        {{#if radio}}
+          <button type="button" class="btn btn-default btn-xs toggle-radio-button active"><i class="glyphicon glyphicon-music"></i> radio</button>
+        {{else}}
+          <button type="button" class="btn btn-default btn-xs toggle-radio-button"><i class="glyphicon glyphicon-music"></i> radio</button>
+        {{/if}}
+      </div>
+    </script>
+    
     <script type="template" id="template-player">
       {{#if title}}
           {{#if image.cover_url_small}}
@@ -582,10 +697,10 @@
           </div>
           <audio class="pull-left" src="{{audio_src}}" controls autoplay></audio>
           <div class="controls pull-left">
-            <button type="button" class="btn btn-default btn-sm shuffle-btn"><i class="glyphicon glyphicon-random"></i></button>
-            <button type="button" class="btn btn-default btn-sm repeat-btn"><i class="glyphicon glyphicon-repeat"></i></button>
-            <button type="button" class="btn btn-default btn-sm prev-btn"><i class="glyphicon glyphicon-step-backward"></i></button>
-            <button type="button" class="btn btn-default btn-sm next-btn"><i class="glyphicon glyphicon-step-forward"></i></button>
+            <button type="button" class="btn btn-default btn-xs shuffle-btn"><i class="glyphicon glyphicon-random"></i></button>
+            <button type="button" class="btn btn-default btn-xs repeat-btn"><i class="glyphicon glyphicon-repeat"></i></button>
+            <button type="button" class="btn btn-default btn-xs prev-btn"><i class="glyphicon glyphicon-step-backward"></i></button>
+            <button type="button" class="btn btn-default btn-xs next-btn"><i class="glyphicon glyphicon-step-forward"></i></button>
           </div>
       {{else}}
           <p class="player-song-info">
@@ -640,6 +755,8 @@
     <script src="static/js/views/queue.js"></script>
     <script src="static/js/views/search.js"></script>
     <script src="static/js/views/providers.js"></script>
+    <script src="static/js/views/queue_control.js"></script>
+    <script src="static/js/views/explore.js"></script>
     <script src="static/js/routes/router.js"></script>
     <script src="static/js/parallel_queue.js"></script>
     <script src="static/js/init.js"></script>

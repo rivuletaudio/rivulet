@@ -206,7 +206,16 @@ var PlaylistsView = Backbone.View.extend({
     var title = playlist.get('title');
     title = title.toLowerCase();
     title = title.replace(/\W/g, '_');
-    download(title + '.wwp', JSON.stringify(playlist.toJSON()));
+
+    playlist = playlist.toJSON();
+    playlist.songs = _.map(playlist.songs.toJSON(), function(song) {
+      delete song['percent-dl'];
+      delete song['pieces'];
+      delete song['requested'];
+      return song;
+    });
+   
+    download(title + '.wwp', JSON.stringify(playlist));
   },
   
   edit_start: function(e) {

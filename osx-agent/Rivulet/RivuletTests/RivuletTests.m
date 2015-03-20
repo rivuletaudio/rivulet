@@ -1,11 +1,3 @@
-//
-//  RivuletTests.m
-//  RivuletTests
-//
-//  Created by Rui Zhao on 2015-03-18.
-//  Copyright (c) 2015 rivulet. All rights reserved.
-//
-
 #import <Cocoa/Cocoa.h>
 #import <XCTest/XCTest.h>
 

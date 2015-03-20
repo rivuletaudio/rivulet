@@ -10,7 +10,6 @@ var SearchResultsView = Backbone.View.extend({
     if (this.model) {
       this.listenTo(this.model, "change:searching", this.render);
       this.listenTo(this.model.get('results'), "reset", this.render);
-      this.listenTo(App.playlists, "change", this.render);
     }
     this.songViews = [];
     this.render();

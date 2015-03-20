@@ -30,7 +30,9 @@ $(function(){
       if (song_sources) {
         song_sources = JSON.parse(song_sources);
         for (var key in song_sources) {
-          song_sources[key] = new SongSources(song_sources[key]);
+          var song_source = song_sources[key];
+          song_source.sources = new SourceCollection(song_source.sources);
+          song_sources[key] = new SongSources(song_source);
         }
       } else {
         song_sources = {};
@@ -42,7 +44,12 @@ $(function(){
     if (supports_html5_storage()) {
       var song_sources = {};
       for (var key in App.song_sources) {
-        song_sources[key] = App.song_sources[key].toJSON();
+        var song_source = App.song_sources[key].toJSON();
+        song_source.sources = _.map(song_source.sources.toJSON(), function(source) {
+          delete source.downloading;
+          return source;
+        });
+        song_sources[key] = song_source;
       }
       localStorage['song_sources'] = JSON.stringify(song_sources);
     }
@@ -52,6 +59,10 @@ $(function(){
       var playlists = localStorage['playlists'];
       if (playlists) {
         playlists = JSON.parse(playlists);
+        playlists = _.map(playlists, function(playlist) {
+          playlist.songs = new SongCollection(playlist.songs);
+          return playlist;
+        });
         playlists = new PlaylistCollection(playlists);
       } else {
         playlists = new PlaylistCollection();
@@ -60,8 +71,21 @@ $(function(){
     }
   };
   App.save_playlists = function() {
+    
     if (supports_html5_storage()) {
-      localStorage['playlists'] = JSON.stringify(App.playlists.toJSON());
+      var playlists = App.playlists.toJSON();
+      playlists = _.map(playlists, function(playlist) {
+        var songs = playlist.songs.toJSON();
+        playlist.songs = _.map(songs, function(song) {
+          delete song['percent-dl'];
+          delete song['pieces'];
+          delete song['requested'];
+          return song;
+        });
+        return  playlist;
+      });
+
+      localStorage['playlists'] = JSON.stringify(playlists);
     }
   };
   App.load_providers = function() {
@@ -103,15 +127,26 @@ $(function(){
   App.play_queue = new PlayQueue();
   App.search_results_model = new SearchResults();
   App.torrents = new TorrentCollection();
- 
+  App.recommended_playlists = new PlaylistCollection();
+
   App.player_view = new PlayerView({
     el: $('#player')[0],
     model: App.play_queue
   });
 
+  App.queue_control_view = new QueueControlView({
+    el: $('#queue-control')[0],
+    model: App.play_queue
+  });
+  
   App.queue_view = new QueueView({
     el: $('#queue')[0],
     model: App.play_queue
+  });
+
+  App.explore_view = new ExploreView({
+    el: app_el,
+    model: App.recommended_playlists
   });
 
   App.search_results_view = new SearchResultsView({
@@ -139,6 +174,7 @@ $(function(){
   });
  
   App.page_views = [App.search_results_view,
+                    App.explore_view,
                     App.playlist_view,
                     App.playlists_view,
                     App.torrents_view,

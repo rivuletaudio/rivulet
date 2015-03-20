@@ -13,7 +13,7 @@ var SongSources = Backbone.Model.extend({
         sources: new SourceCollection(this.get('sources'))
       });
     }
-  }, 
+  },
   defaults: function() {
     return {
       selected_id: undefined,

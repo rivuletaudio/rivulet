@@ -1,6 +1,7 @@
 from tornado.web import RequestHandler, Application, url
 from tornado.ioloop import IOLoop
 from tornado.web import gen
+from tornado.httpclient import AsyncHTTPClient
 import json
 import sys
 import os
@@ -9,14 +10,17 @@ from tornado.web import gen
 from tornado.web import asynchronous
 import threading
 import thread
+import urllib
 import traceback
 import yaml
+from tornado.httpclient import AsyncHTTPClient
 import argparse
 sys.path.append(
     os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
 from server import torrent
 from server import search
 from server.audiotranscode import AudioTranscode
+from datetime import datetime
 
 #TODO: make this work on more operating systems?
 if 'XDG_CONFIG_HOME' in os.environ.keys():
@@ -136,15 +140,14 @@ class PlayHandler(RequestHandler):
         self.start_offset = start
         self.end_offset = end
         try:
-            tparams = None
+            def on_tparams(tparams):
+                StreamWorker(tparams, path, self.on_done, self.on_data, self.on_error, self.on_length, start, end).start()
             if torrent_link is not None:
-                # TODO: fix this blocking network call
-                tparams = session.torrent_params_from_torrent_url(torrent_link)
+                session.torrent_params_from_torrent_url(torrent_link, on_tparams)
             elif magnet is not None:
-                tparams = session.torrent_params_from_magnet_link(magnet)
+                on_tparams(session.torrent_params_from_magnet_link(magnet))
             elif infohash is not None:
-                tparams = session.torrent_params_from_info_hash(infohash)
-            StreamWorker(tparams, path, self.on_done, self.on_data, self.on_error, self.on_length, start, end).start()
+                on_tparams(session.torrent_params_from_info_hash(infohash))
         except Exception as e:
             self.on_error(e)
 
@@ -176,6 +179,7 @@ class PlayHandler(RequestHandler):
 
 class DownloadHandler(RequestHandler):
     # ?[torrent_link= and/or magnet= and/or info_hash=]&path=
+    @asynchronous
     def get(self):
         torrent_link = self.get_argument('torrent_link', None)
         infohash = self.get_argument('info_hash', None)
@@ -191,33 +195,35 @@ class DownloadHandler(RequestHandler):
 
         # We don't need to create a StreamWorker in a seperate thread, just add a TorrentStream
         try:
-            tparams = None
-            if torrent_link is not None:
-                # TODO: fix this blocking network call
-                tparams = session.torrent_params_from_torrent_url(torrent_link)
-            elif magnet is not None:
-                tparams = session.torrent_params_from_magnet_link(magnet)
-            elif infohash is not None:
-                tparams = session.torrent_params_from_info_hash(infohash)
-            try:
-                print "About to start download:", path
-                def thread_func():
-                    downloader = torrent.TorrentStream(session, tparams, path, 0, None, False)
-                    for kind, data in downloader.data():
-                        # TODO: wait for the metadata only
-                        print "got data from download request..."
-                thread.start_new_thread(thread_func, ())
+            def on_tparams(tparams):
+                try:
+                    print "About to start download:", path
+                    def thread_func():
+                        downloader = torrent.TorrentStream(session, tparams, path, 0, None, False)
+                        for kind, data in downloader.data():
+                            # TODO: wait for the metadata only
+                            print "got data from download request..."
+                    thread.start_new_thread(thread_func, ())
+                    self.on_success()
 
-            except Exception as e:
-                self.on_error(e)
+                except Exception as e:
+                    self.on_error(e)
+            if torrent_link is not None:
+                session.torrent_params_from_torrent_url(torrent_link, on_tparams)
+            elif magnet is not None:
+                on_tparams(session.torrent_params_from_magnet_link(magnet))
+            elif infohash is not None:
+                on_tparams(session.torrent_params_from_info_hash(infohash))
         except Exception as e:
             self.on_error(e)
-        self.write(json.dumps({"status": "ok"}))
-        self.finish()
 
     def on_error(self, e):
         print traceback.format_exc(e)
         self.set_status(500)
+        self.finish()
+
+    def on_success(self):
+        self.write(json.dumps({"status": "ok"}))
         self.finish()
 
         
@@ -305,6 +311,79 @@ class SourcesHandler(RequestHandler):
         self.write(json.dumps({"status": "ok","result": results}))
         self.finish()
 
+class RecommendationHandler(RequestHandler):
+
+    api_key = config.get('lastfm_api_key', '112bceb16f3441a10fc4b4694548372f')
+    recommendation_results_max = 20
+    
+    @gen.coroutine
+    def get(self):
+        url = ('http://ws.audioscrobbler.com/2.0/?method=chart.getTopTracks' +
+         '&api_key=' +  
+          RecommendationHandler.api_key +
+         '&format=json')
+
+        http_client = AsyncHTTPClient()
+        response = yield http_client.fetch(url, raise_error=False)
+        if response.error:
+            print 'Error:', response.error
+        tracks = json.loads(response.body)['tracks']['track']
+        track_data = []
+        for t in tracks: 
+            if len(track_data) == RecommendationHandler.recommendation_results_max:
+                break
+            track = {'artist': t['artist']['name'], 'title': t['name']}
+            if 'image' in t.keys() and len(t['image']) > 0:
+                track['image'] = {}
+                for img in t['image']:
+                    track['image']['cover_url_' + img['size']] = img['#text']
+            track_data.append(track)
+
+        td = datetime.today();
+        title = "Recommended Playlist " + td.strftime('%Y-%m-%d')
+        result = {"title": title, "songs": track_data}
+        self.write(json.dumps({"status": "ok","result": result}))
+        self.finish()
+
+
+class SimilarHandler(RequestHandler):
+    api_key = config.get('lastfm_api_key', '112bceb16f3441a10fc4b4694548372f')
+
+    # ?artist=<text>&title=<text>
+    @gen.coroutine
+    def get(self):
+        artist = self.get_argument('artist')
+        title = self.get_argument('title')
+        url = 'http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist='+urllib.quote(artist.encode('utf8'))+'&track='+urllib.quote(title.encode('utf8'))+'&api_key='+SimilarHandler.api_key+'&format=json'
+        print 'fetching', url
+        http_client = AsyncHTTPClient()
+        response = yield http_client.fetch(url, raise_error=False)
+        if response.error:
+            print 'Error:', response.error
+
+        res = json.loads(response.body)['similartracks']['track']
+        suggestions = []
+        if type(res) is list:
+            for r in res:
+                image = {}
+                if 'image' in r.keys():
+                    small = filter(lambda x: x['size'] == 'small', r['image'])
+                    if len(small) > 0:
+                      image['cover_url_small'] = small[0]['#text']
+                    medium = filter(lambda x: x['size'] == 'medium', r['image'])
+                    if len(medium) > 0:
+                      image['cover_url_medium'] = medium[0]['#text']
+                    large = filter(lambda x: x['size'] == 'large', r['image'])
+                    if len(large) > 0:
+                      image['cover_url_large'] = large[0]['#text']
+                    extralarge = filter(lambda x: x['size'] == 'extralarge', r['image'])
+                    if len(extralarge) > 0:
+                      image['cover_url_extralarge'] = extralarge[0]['#text']
+                suggestions.append({'artist': r['artist']['name'], 'title': r['name'], 'image': image})
+        self.write(json.dumps({"status": "ok","result": suggestions}))
+        self.finish()
+
+
 def make_app():
     return Application([
         url(r'/static/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), './public/static')}),
@@ -315,8 +394,10 @@ def make_app():
         url(r"/status", StatusHandler),
         url(r"/torrents_status", TorrentsStatusHandler),
         url(r"/available_sources", AvailableSourcesHandler),
+        url(r"/recommendation", RecommendationHandler),
+        url(r"/similar", SimilarHandler),
         url(r"/download", DownloadHandler)
-        ])
+    ])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

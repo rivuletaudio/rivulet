@@ -21,7 +21,7 @@ NSString* portBusyUIText = @"port 9074 is not available";
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   
   statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-  [statusItem setTitle:@"Rivulet"];
+  [statusItem setImage:[NSImage imageNamed:@"status"]];
   
   statusMenu = [[NSMenu alloc] initWithTitle:@""];
   serverInfo = [[NSMenuItem alloc] initWithTitle:notRunningUIText action:NULL keyEquivalent:@""];
@@ -67,9 +67,12 @@ NSString* portBusyUIText = @"port 9074 is not available";
 
 - (void)toggleServerAction {
   if (backend) {
-    killTimer = [NSTimer timerWithTimeInterval:10.0 target:self selector:@selector(killBackend) userInfo:nil repeats:NO];
-    [backend terminate];
+    killTimer = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(killBackend) userInfo:nil repeats:NO];
+    
+    kill(backend.processIdentifier, SIGINT);
     [serverInfo setTitle:terminatingUIText];
+    [toggleServerBtn setAction:nil];
+    
   } else {
     
     if ([self isPortAvailable:9074]) {
@@ -102,8 +105,8 @@ NSString* portBusyUIText = @"port 9074 is not available";
 
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSTaskDidTerminateNotification object:backend];
   backend = nil;
-  [serverInfo setTitle:notRunningUIText];
-  [toggleServerBtn setTitle:startServerUIText];
+
+  [self setUpStartServerUI];
 }
 
 - (void)openBrowser {
@@ -125,6 +128,15 @@ NSString* portBusyUIText = @"port 9074 is not available";
     kill(backend.processIdentifier, SIGKILL);
     backend = nil;
   }
+  
+  [self setUpStartServerUI];
+}
+
+- (void) setUpStartServerUI
+{
+  [serverInfo setTitle:notRunningUIText];
+  [toggleServerBtn setTitle:startServerUIText];
+  [toggleServerBtn setAction:@selector(toggleServerAction)];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {

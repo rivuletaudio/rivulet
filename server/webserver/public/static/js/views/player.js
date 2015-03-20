@@ -75,21 +75,25 @@ var PlayerView = Backbone.View.extend({
 
   prev: function(e){
     e.preventDefault();
+    $(e.currentTarget).blur();
     App.play_queue.play_prev()
   },
 
   next: function(e){
     e.preventDefault();
+    $(e.currentTarget).blur();
     App.play_queue.play_next();
   },
 
   shuffle: function(e){
     e.preventDefault();
+    $(e.currentTarget).blur();
     this.model.set('shuffle', !this.model.get('shuffle'));
   },
 
   repeat: function(e) {
     e.preventDefault();
+    $(e.currentTarget).blur();
     this.model.set('repeat', !this.model.get('repeat'));
   }
 });

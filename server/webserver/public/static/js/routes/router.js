@@ -1,7 +1,8 @@
 var MainRouter = Backbone.Router.extend({
 
   routes: {
-    "":                     "search",
+    "":                     "explore",
+    "explore":              "explore",
     "search/:term":         "search",
     "search":               "search",
     "torrents":             "torrents",
@@ -19,6 +20,10 @@ var MainRouter = Backbone.Router.extend({
       }
     }
     view.page_init(param);
+  },
+
+  explore: function(term) {
+    this.page_change(App.explore_view, 'tab-title-explore');
   },
 
   search: function(term) {
@@ -60,7 +65,7 @@ var MainRouter = Backbone.Router.extend({
           if (path.length > 0 && path[0] == '/') {
             path = path.substr(1);
           }
-          if(available[info_hash] && (available[info_hash][path] || available[info_hash][path_short])){
+          if(available[info_hash] && available[info_hash][path]){
             // this shows each source only once
             // this is a shortcut; what we really want is to deduplicate the queue and the playlists
             if (!added[info_hash+path]) {
